@@ -1,0 +1,94 @@
+# 📚 LiterAlura - Catálogo de Libros
+
+**LiterAlura** es una aplicación full-stack que funciona como un catálogo de libros interactivo. Permite a los usuarios buscar libros a través de la API pública de **OpenLibrary** , visualizar la información, y almacenar libros y autores de interés en una base de datos local para consultas personalizadas.
+
+> 🔧 **Backend:** Java + Spring Boot  
+> 🎨 **Frontend preparado para:** Svelte
+
+---
+
+## ✨ Funcionalidades (Features)
+
+El backend de la aplicación ofrece una API REST con las siguientes capacidades:
+
+- **🔎 Buscar libro por título:** Consulta la API de OpenLibrary y guarda el libro y su autor si no están en la base local.
+- **📚 Listar todos los libros registrados:** Muestra todos los libros consultados y guardados.
+- **👨‍💼 Listar todos los autores registrados:** Lista todos los autores guardados.
+- **📅 Listar autores vivos en un año determinado:** Permite consultar qué autores estaban vivos en un año específico.
+- **🌍 Listar libros por idioma:** Filtra libros según un idioma elegido (ej. `es`, `en`).
+- **📈 Generar estadísticas:** Muestra el top 5 de libros más descargados, entre otros datos.
+
+---
+
+## 🛠️ Tecnologías Utilizadas
+
+### 🔙 Backend
+
+- **Java 17**: Versión LTS del lenguaje.
+- **Spring Boot 3**: Framework para la creación de la API REST.
+- **Spring Data JPA**: Persistencia y comunicación con la base de datos.
+- **Maven**: Gestión de dependencias y construcción.
+- **PostgreSQL**: Base de datos relacional.
+
+### 🗄️ Base de Datos
+
+- **Docker & Docker Compose**: Entorno aislado y consistente para la base de datos, el frontend y el backend, todo en un solo contenedor.
+
+### 🎨 Frontend (Preparado para)
+
+- **Svelte**: Framework reactivo para UI
+
+---
+
+## 🏗️ Arquitectura y Principios de Diseño
+
+### 🧱 Arquitectura MVC (Modelo-Vista-Controlador)
+
+- **Modelo:** Entidades JPA (`Book`, `Author`).
+- **Vista:** Respuesta JSON de la API REST.
+- **Controlador:** Gestiona peticiones HTTP, delega a servicios, devuelve respuestas.
+
+### 🎯 Principios de Diseño
+
+- **SOLID**
+  - **S**: Una clase = una responsabilidad.
+  - **O**: Código extensible sin modificar lo existente.
+  - **L**: Herencias coherentes y respetadas.
+  - **I**: Interfaces específicas para cada necesidad.
+  - **D**: Se depende de interfaces, no implementaciones concretas.
+
+- **KISS (Keep It Simple, Stupid)**: Soluciones simples y directas.
+- **DRY (Don't Repeat Yourself)**: Reutilización de lógica de negocio.
+
+---
+
+## 🚀 Puesta en Marcha (Setup)
+
+### 🔧 Prerrequisitos
+
+- Java JDK 17 o superior
+- Apache Maven
+- Docker y Docker Compose
+- IDE para Java
+
+### Estructura del Proyecto
+
+com.Alura.LiterAlura
+├── config/              // Clases de configuración (CORS, etc.)
+├── controller/          // Controladores REST
+├── service/             // Lógica de negocio
+├── model/               // Entidades JPA (Book, Author)
+├── repository/          // Interfaces de Spring Data JPA
+├── dto/                 // Data Transfer Objects
+└── exception/           // Manejo de excepciones personalizadas
+
+
+### 🛠️ Instalación
+
+
+
+1. **Clonar el repositorio:**
+
+```bash
+git clone https://github.com/tu-usuario/LiterAlura.git
+cd LiterAlura

@@ -1,0 +1,235 @@
+# Versión de la especificación OpenAPI
+openapi: 3.0.3
+
+# Información general de la API
+info:
+  title: OpenLibrary API (Para LiterAlura)
+  description: |-
+    Una especificación OpenAPI simplificada para la API de OpenLibrary, 
+    enfocada en los endpoints necesarios para el proyecto LiterAlura.
+    La API de OpenLibrary permite el acceso programático a su catálogo de libros.
+  version: 1.0.0
+  contact:
+    name: OpenLibrary
+    url: https://openlibrary.org/developers/api
+
+# Servidor base de la API
+servers:
+  - url: https://openlibrary.org
+    description: Servidor principal de OpenLibrary
+
+# Definición de las rutas (endpoints) de la API
+paths:
+  # --- Endpoint de Búsqueda ---
+  /search.json:
+    get:
+      summary: Buscar libros y autores
+      description: Permite realizar búsquedas generales. Es el endpoint principal para encontrar libros por título o autor.
+      tags:
+        - Búsqueda
+      parameters:
+        - name: title
+          in: query
+          description: "Buscar por el título del libro. Ejemplo: 'Don Quixote'"
+          required: false
+          schema:
+            type: string
+        - name: author
+          in: query
+          description: "Buscar por el nombre del autor. Ejemplo: 'Cervantes'"
+          required: false
+          schema:
+            type: string
+        - name: q
+          in: query
+          description: "Una consulta de texto libre más general. Ejemplo: 'the lord of the rings'"
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: "Número de resultados a devolver. Por defecto 100."
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Búsqueda exitosa. Devuelve una lista de documentos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResult'
+        '404':
+          description: No se encontraron resultados.
+
+  # --- Endpoint para detalles de un libro ---
+  /api/books:
+    get:
+      summary: Obtener detalles de uno o más libros
+      description: Recupera información detallada de un libro usando su OLID (Open Library ID).
+      tags:
+        - Libros
+      parameters:
+        - name: bibkeys
+          in: query
+          description: "Claves de los libros a buscar, prefijadas por 'OLID:'. Ejemplo: 'OLID:OL45883W'"
+          required: true
+          schema:
+            type: string
+        - name: jscmd
+          in: query
+          description: "Define el nivel de detalle. 'data' para obtener todos los datos."
+          required: true
+          schema:
+            type: string
+            enum: [data, details]
+            default: data
+        - name: format
+          in: query
+          description: "Formato de la respuesta."
+          required: true
+          schema:
+            type: string
+            default: json
+      responses:
+        '200':
+          description: Detalles del libro obtenidos correctamente. La respuesta es un objeto donde la clave es el 'bibkey' solicitado.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/BookDetails'
+
+  # --- Endpoint para detalles de un autor ---
+  /authors/{authorId}.json:
+    get:
+      summary: Obtener detalles de un autor
+      description: Recupera información sobre un autor específico usando su ID (OLID).
+      tags:
+        - Autores
+      parameters:
+        - name: authorId
+          in: path
+          description: "El ID del autor. Ejemplo: 'OL34184A'"
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalles del autor obtenidos correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorDetails'
+
+  # --- Endpoint para portadas de libros ---
+  /b/olid/{coverId}-M.jpg:
+    get:
+      summary: Obtener la portada de un libro
+      description: Devuelve la imagen de la portada de un libro en tamaño mediano (M).
+      tags:
+        - Portadas
+      parameters:
+        - name: coverId
+          in: path
+          description: "El ID de la edición del libro (OLID). Ejemplo: 'OL7353617M'"
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Imagen de la portada.
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Portada no encontrada.
+
+
+# Componentes reutilizables (esquemas de datos)
+components:
+  schemas:
+    SearchResult:
+      type: object
+      properties:
+        numFound:
+          type: integer
+          description: "Número total de resultados encontrados."
+        start:
+          type: integer
+        docs:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+                description: "Título del libro."
+              author_name:
+                type: array
+                items:
+                  type: string
+                description: "Nombres de los autores."
+              first_publish_year:
+                type: integer
+              cover_i:
+                type: integer
+                description: "ID numérico de la portada."
+              author_key:
+                type: array
+                items:
+                  type: string
+                description: "OLIDs de los autores."
+              language:
+                type: array
+                items:
+                  type: string
+                description: "Idiomas del libro."
+
+    BookDetails:
+      type: object
+      properties:
+        title:
+          type: string
+        authors:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+                description: "La ruta al recurso del autor (ej. /authors/OL34184A)."
+        number_of_pages:
+          type: integer
+        publish_date:
+          type: string
+
+    AuthorDetails:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Nombre completo del autor."
+        birth_date:
+          type: string
+          description: "Fecha de nacimiento."
+        death_date:
+          type: string
+          description: "Fecha de fallecimiento (si aplica)."
+        bio:
+          type: string
+          description: "Biografía del autor."
+
+# Agrupación de endpoints en la UI
+tags:
+  - name: Búsqueda
+    description: APIs para buscar en el catálogo.
+  - name: Libros
+    description: Operaciones relacionadas con libros específicos.
+  - name: Autores
+    description: Operaciones relacionadas con autores específicos.
+  - name: Portadas
+    description: APIs para obtener imágenes de portadas.
